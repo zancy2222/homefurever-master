@@ -1764,10 +1764,8 @@ margin-right: 200px;
 
 
 
-
-
 /* MESSAGES */
-.mesbox{
+.mesbox {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1784,13 +1782,12 @@ margin-right: 200px;
   display: flex;
 }
 
-.mesbox3{
+.mesbox3 {
   width: 100%;
   height: auto;
   display: flex;
   flex-direction: column;
   margin-left: 15%;
-
 }
 
 .meschat-container {
@@ -1875,11 +1872,12 @@ margin-right: 200px;
   width: auto !important;
 }
 
-.mescline{
+.mescline {
   height: 2px;
   background-color: #ECE9E9;
   width: 100%;
 }
+
 .meschat-area-header {
   display: flex;
   align-items: center;
@@ -1897,45 +1895,27 @@ margin-right: 200px;
   font-weight: bold;
 }
 
+/* Updated chat messages container */
 .meschat-messages {
   flex: 1;
   overflow-y: auto;
   margin-bottom: 20px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  padding: 10px;
 }
 
-.mesrecepient{
-  width: 50%;
-
-}
-
-.mesrchat-message {
+/* Receiver's messages (left side) */
+.messender {
   display: flex;
-  align-items: flex-start;
-  justify-content: right;
-  margin-top: 650px;
-}
-
-.mesrmessage-text {
-  background-color: #e6e6e6;
-  color: black;
-  padding: 10px 15px;
-  border-radius: 20px;
-  margin-right: 10px;
-}
-
-.mescsender{
-
-  width: 50%;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .meschat-message {
   display: flex;
-  align-items: flex-end;
-
-  justify-content: right;
-  margin-top: 560px;
+  align-items: center;
+  max-width: 60%;
 }
 
 .mesmessage-text {
@@ -1943,16 +1923,41 @@ margin-right: 200px;
   color: black;
   padding: 10px 15px;
   border-radius: 20px;
-  margin-left: 10px;
   text-align: left;
+  word-wrap: break-word;
 }
 
+/* Sender's messages (right side) */
+.mesrecepient {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.mesrchat-message {
+  display: flex;
+  align-items: center;
+  max-width: 60%;
+}
+
+.mesrmessage-text {
+  background-color: #ff66c4;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px;
+  text-align: left;
+  word-wrap: break-word;
+}
+
+/* Profile Image Styling */
 .mesmessage-img {
   width: 40px;
   height: 40px;
-  align-items: end;
+  border-radius: 50%;
+  margin: 5px;
 }
 
+/* Chat Input Section */
 .meschat-input {
   display: flex;
   align-items: center;
@@ -1963,9 +1968,6 @@ margin-right: 200px;
   min-width: 100%;
 }
 
-.meschatinph{
-  width: 100% !important;
-}
 .meschatinp {
   flex: 1;
   padding: 10px;
@@ -1980,9 +1982,6 @@ margin-right: 200px;
   border: none;
   border-radius: 20px;
   padding: 10px 20px;
-  width: 80px !important;
-  margin-bottom: 0px !important;
-  margin-top:0px !important;
   font-weight: bold;
 }
 
@@ -1992,6 +1991,7 @@ margin-right: 200px;
   margin-right: 15px;
   margin-left: 10px;
 }
+
 
 /* ADOPTION FORM */
 .form-box1{

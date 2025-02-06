@@ -22,32 +22,33 @@ const Login =()=>{
     const [error, setError] = useState('');
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
+      e.preventDefault();
+      try {
           const response = await axios.post(`${config.address}/api/user/login`, {
-            username,
-            password
+              username,
+              password
           });
           const token = response.data.accessToken;
-          localStorage.setItem('token', token); // Save the token to localStorage
-          
-          // Decode and store user info
+          localStorage.setItem('token', token); // Store token
+  
+          // Decode and get user info
           const decodedToken = jwtDecode(token);
           const userRole = decodedToken.role;
-      
+  
           if (userRole === 'pending' || userRole === 'verified') {
-            navigate('/browse/pets');
+              navigate('/browse/pets');
           } else if (userRole === 'admin' || userRole === 'super-admin') {
-            navigate('/home');
+              navigate('/home');
           } else if (userRole === 'pending-admin') {
-            navigate('/admin/welcome');
+              navigate('/admin/welcome');
           }
-          
-        } catch (err) {
+  
+      } catch (err) {
           console.error(err);
           setError('Invalid username or password');
-        }
-      };
+      }
+  };
+  
       
       
 

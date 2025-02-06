@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import "./Users.css";
+import { jwtDecode } from "jwt-decode"; // Import jwtDecode
+import axios from "axios";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import UserPh from "./assets/userph.jpg";
-import Attachment from "./assets/attachment.png";
 import PinkNavigationBar from "./PinkNavigationBar";
-import axios from "axios";
 
 const Messages = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const senderId = "670d541f377eee8ae50b2bae"; // Replace with the logged-in user's ID
-  const receiverId = "670a04a34f63c22acf3d8c9a"; // Replace with the admin's ID
+  const [senderId, setSenderId] = useState(null); // Set senderId dynamically
+  const receiverId = "670a04a34f63c22acf3d8c9a"; // Admin's ID
+
+  // Get senderId from JWT Token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setSenderId(decodedToken.id); // Set senderId from token
+    }
+  }, []);
 
   // Fetch messages on component mount
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    if (senderId) {
+      fetchMessages();
+    }
+  }, [senderId]);
 
   const fetchMessages = async () => {
     try {
@@ -46,7 +55,6 @@ const Messages = () => {
     }
   };
 
-  // Get the last message (either from the user or admin)
   const getLastMessage = () => {
     if (messages.length === 0) return "No messages yet";
     const lastMessage = messages[messages.length - 1];
@@ -64,9 +72,6 @@ const Messages = () => {
         <div className="meschat-container">
           <div className="meschat-sidebar">
             <div className="meschat-header">Messages</div>
-            <div className="meschat-search">
-              <input type="text" placeholder="Search for people" />
-            </div>
             <div className="meschat-list">
               <div className="mesactive-chat-item">
                 <Image src={UserPh} roundedCircle className="meschat-item-img" />
@@ -78,11 +83,6 @@ const Messages = () => {
             </div>
           </div>
           <div className="meschat-area">
-            <div className="meschat-area-header">
-              <Image src={UserPh} roundedCircle className="meschat-area-img" />
-              <div className="meschat-area-name">Admin</div>
-            </div>
-            <div className="mescline" />
             <div className="meschat-messages">
               {messages.map((msg, index) => (
                 <div
@@ -90,14 +90,13 @@ const Messages = () => {
                   className={msg.senderId === senderId ? "mesrecepient" : "messender"}
                 >
                   <div className="meschat-message">
-                    <Image src={UserPh} roundedCircle className="mesmessage-img" />
+                  <Image src={UserPh} roundedCircle className="mesmessage-img" />
                     <div className="mesmessage-text">{msg.message}</div>
                   </div>
                 </div>
               ))}
             </div>
             <div className="meschat-input">
-              <Image src={Attachment} className="mescattachment" />
               <input
                 type="text"
                 placeholder="Type your message"
@@ -105,11 +104,9 @@ const Messages = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-              <div>
-                <Button className="mescsend-button" onClick={handleSendMessage}>
-                  Send
-                </Button>
-              </div>
+              <Button className="mescsend-button" onClick={handleSendMessage}>
+                Send
+              </Button>
             </div>
           </div>
         </div>
