@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import Homepage from "./Homepage";
-import Button from "react-bootstrap/Button";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
-import "./Homepage.css";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import Image from "react-bootstrap/Image";
-import TaskBar from "./TaskBar";
+import Button from "react-bootstrap/Button";
 import NavigationBar from "./NavigationBar";
+import TaskBar from "./TaskBar";
 import UserPh from "./assets/userph.jpg";
 import Attachment from "./assets/attachment.png";
-import axios from "axios";
 
 const Chatroom = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const adminId = "670a04a34f63c22acf3d8c9a"; // Admin's ID
-  const { userId } = useParams(); // Get the user ID from the URL params
+  const adminId = "670a04a34f63c22acf3d8c9a"; 
+  const { userId } = useParams(); 
 
-  // Fetch messages between the admin and the selected user
+  // Fetch list of users who have sent messages
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/messages/users");
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
+
+  // Fetch messages between admin and selected user
   useEffect(() => {
     if (userId) {
       fetchMessages(userId);
@@ -29,9 +39,7 @@ const Chatroom = () => {
 
   const fetchMessages = async (userId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/messages/${userId}/${adminId}`
-      );
+      const response = await axios.get(`http://localhost:8000/api/messages/${userId}/${adminId}`);
       setMessages(response.data);
       setSelectedUser(userId);
     } catch (error) {
@@ -49,114 +57,89 @@ const Chatroom = () => {
         message,
       });
       setMessage("");
-      fetchMessages(selectedUser); // Refresh messages after sending
+      fetchMessages(selectedUser);
     } catch (error) {
       console.error("Failed to send message:", error);
     }
   };
 
-  // Mock list of users (replace with actual data from your backend)
-  const users = [
-    { _id: "670d541f377eee8ae50b2bae", name: "Bipolar" }
-  ];
-
   return (
-    <>
-      <div className="ulbox">
-        <div className="navbox">
-          <NavigationBar />
-        </div>
-        <div className="box2">
-          <TaskBar />
-          <div className="box3">
-            <div className="chat-container">
-              <div className="chat-sidebar">
-                <div className="chat-header">Messages</div>
-                <div className="chat-search">
-                  <input type="text" placeholder="Search for people" />
-                </div>
-                <div className="chat-list">
-                  {users.map((user) => (
+    <div className="ulbox">
+      <div className="navbox">
+        <NavigationBar />
+      </div>
+      <div className="box2">
+        <TaskBar />
+        <div className="box3">
+          <div className="chat-container">
+            <div className="chat-sidebar">
+              <div className="chat-header">Messages</div>
+              <div className="chat-search">
+                <input type="text" placeholder="Search for people" />
+              </div>
+              <div className="chat-list">
+                {users.length > 0 ? (
+                  users.map((user) => (
                     <div
                       key={user._id}
-                      className={`chat-item ${
-                        selectedUser === user._id ? "active-chat-item" : ""
-                      }`}
+                      className={`chat-item ${selectedUser === user._id ? "active-chat-item" : ""}`}
                       onClick={() => fetchMessages(user._id)}
                     >
                       <Image src={UserPh} roundedCircle className="chat-item-img" />
                       <div className="chat-item-content">
                         <div className="chat-item-name">{user.name}</div>
-                        <div className="chat-item-message">
-                          {messages.length > 0
-                            ? messages[messages.length - 1].message
-                            : "No messages yet"}
-                        </div>
                       </div>
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  <p>No users found</p>
+                )}
+              </div>
+            </div>
+
+            <div className="chat-area">
+              <div className="chat-area-header">
+                <Image src={UserPh} roundedCircle className="chat-area-img" />
+                <div className="chat-area-name">
+                  {users.find((user) => user._id === selectedUser)?.name || "Select a user"}
                 </div>
               </div>
-              <div className="chat-area">
-                <div className="chat-area-header">
-                  <Image src={UserPh} roundedCircle className="chat-area-img" />
-                  <div className="chat-area-name">
-                    {users.find((user) => user._id === selectedUser)?.name ||
-                      "Select a user"}
-                  </div>
-                </div>
-                <div className="cline" />
-                <div className="chat-messages">
-                  {messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={
-                        msg.senderId === adminId ? "csender" : "recepient"
-                      }
-                    >
-                      <div
-                        className={
-                          msg.senderId === adminId ? "chat-message" : "rchat-message"
-                        }
-                      >
-                        {msg.senderId !== adminId && (
-                          <Image src={UserPh} roundedCircle className="message-img" />
-                        )}
-                        <div
-                          className={
-                            msg.senderId === adminId ? "message-text" : "rmessage-text"
-                          }
-                        >
-                          {msg.message}
-                        </div>
-                        {msg.senderId === adminId && (
-                          <Image src={UserPh} roundedCircle className="message-img" />
-                        )}
+              <div className="cline" />
+              <div className="chat-messages">
+                {messages.map((msg, index) => (
+                  <div key={index} className={msg.senderId === adminId ? "csender" : "recepient"}>
+                    <div className={msg.senderId === adminId ? "chat-message" : "rchat-message"}>
+                      {msg.senderId !== adminId && (
+                        <Image src={UserPh} roundedCircle className="message-img" />
+                      )}
+                      <div className={msg.senderId === adminId ? "message-text" : "rmessage-text"}>
+                        {msg.message}
                       </div>
+                      {msg.senderId === adminId && (
+                        <Image src={UserPh} roundedCircle className="message-img" />
+                      )}
                     </div>
-                  ))}
-                </div>
-                <div className="chat-input">
-                  <Image src={Attachment} className="cattachment" />
-                  <input
-                    type="text"
-                    placeholder="Type your message"
-                    className="chatinp"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                  />
-                  <div>
-                    <Button className="csend-button" onClick={handleSendMessage}>
-                      Send
-                    </Button>
                   </div>
-                </div>
+                ))}
+              </div>
+
+              <div className="chat-input">
+                <input
+                  type="text"
+                  placeholder="Type your message"
+                  className="chatinp"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <Button className="csend-button" onClick={handleSendMessage}>
+                  Send
+                </Button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
