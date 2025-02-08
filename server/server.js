@@ -42,3 +42,47 @@ UserRoutes(app, upload);
 const MessageRoutes = require("./routes/messageRoutes");
 app.use("/api/messages", MessageRoutes);
 app.listen(port, () => console.log("The server is all fired up on port 8000."));
+// Add this code to server.js
+const Adoption = require("./models/adoption_model"); // Import the Adoption model
+
+app.get('/api/adoptions/status/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    // Fetch the adoption status based on the logged-in user (you can match based on userId, or a session if necessary)
+    Adoption.find({ v_id: userId })
+        .then(adoptions => {
+            // Transform adoption status into something meaningful
+            const notifications = adoptions.map(adoption => {
+                let statusText = "";
+
+                switch (adoption.status) {
+                    case "accepted":
+                        statusText = "Your adoption has been accepted!";
+                        break;
+                    case "failed":
+                        statusText = `Your adoption failed: ${adoption.failedReason}`;
+                        break;
+                    case "declined":
+                        statusText = "Your adoption has been declined.";
+                        break;
+                    case "complete":
+                        statusText = "Your adoption process is complete.";
+                        break;
+                    default:
+                        statusText = "Your adoption is still pending.";
+                        break;
+                }
+
+                return {
+                    id: adoption.a_id,
+                     text: statusText
+                };
+            });
+
+            res.json(notifications);
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ message: "Error fetching adoption status" });
+        });
+});
