@@ -28,6 +28,22 @@ router.get("/users", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+router.get("/latest-messages", async (req, res) => {
+    try {
+        const latestMessages = await Message.aggregate([
+            { $sort: { timestamp: -1 } }, // Sort messages by latest
+            { $group: { _id: "$senderId", latestMessage: { $first: "$message" }, timestamp: { $first: "$timestamp" } } },
+            { $lookup: { from: "users", localField: "_id", foreignField: "_id", as: "sender" } },
+            { $unwind: "$sender" },
+            { $project: { _id: 1, latestMessage: 1, timestamp: 1, senderName: { $ifNull: ["$sender.p_username", "$sender.a_username"] } } }
+        ]);
+
+        res.json(latestMessages);
+    } catch (error) {
+        console.error("Error fetching latest messages:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 // Send a message
 router.post("/send", messageController.sendMessage);
