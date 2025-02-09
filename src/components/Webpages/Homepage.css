@@ -2661,6 +2661,7 @@ html, body {
     padding: 20px;
     background-color: #fff;
     border-left: 1px solid #ddd;
+    height: 900px;
 }
 
 .chat-area-header {
@@ -2683,13 +2684,16 @@ html, body {
 }
 
 /* Chat Messages */
+/* Chat Messages */
 .chat-messages {
     flex: 1;
-    overflow-y: auto;
+    height: 400px; /* Set a fixed height */
+    overflow-y: auto; /* Enable scrolling */
     display: flex;
     flex-direction: column;
     padding: 10px;
 }
+
 
 /* Recipient Messages */
 .recepient {
